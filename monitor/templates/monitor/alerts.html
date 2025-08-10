@@ -1,0 +1,47 @@
+{% extends 'monitor/base.html' %}
+{% block content %}
+<h2>All Fever Alerts</h2>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Chick</th>
+            <th>Temperature</th>
+            <th>Recorded At</th>
+            <th>Status</th>
+            <th>Resolved At</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for alert in alerts %}
+        <tr>
+            <td>{{ alert.chick.name }}</td>
+            <td>{{ alert.temperature }}°C</td>
+            <td>{{ alert.recorded_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                {% if alert.resolved %}
+                <span class="badge bg-success">Resolved</span>
+                {% else %}
+                <span class="badge bg-danger">Active</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if alert.resolved_at %}
+                {{ alert.resolved_at|date:"Y-m-d H:i" }}
+                {% else %}
+                —
+                {% endif %}
+            </td>
+            <td>
+                {% if not alert.resolved %}
+                <a class="btn btn-sm btn-danger" href="{% url 'resolve_alert' alert.id %}">Resolve</a>
+                {% else %}
+                —
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
