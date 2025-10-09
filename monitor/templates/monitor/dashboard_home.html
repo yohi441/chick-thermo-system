@@ -1,22 +1,25 @@
 {% extends 'monitor/base.html' %}
 {% block content %}
-<div id="dashboard" hx-get="{% url 'dashboard_partial' %}" hx-trigger="every 2s" hx-swap="outerHTML">
-    <h2>Overview</h2>
-    <p>Total Chicks: {{ chicks.count }}</p>
+<div class="space-y-6">
 
-    <h3 class="mt-4 text-danger">Active Alerts</h3>
-    {% if active_alerts %}
-    <ul class="list-group">
-        {% for alert in active_alerts %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ alert.chick.name }} – {{ alert.temperature }}°C ({{ alert.recorded_at|date:"Y-m-d H:i" }})
-            <a class="btn btn-sm btn-danger" href="{% url 'resolve_alert' alert.id %}">Resolve</a>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No active alerts ✅</p>
-    {% endif %}
+  <!-- Overview Card -->
+  <div class="bg-white shadow rounded-xl p-6">
+    <h2 class="text-xl font-semibold text-blue-600">Overview</h2>
+    <p class="mt-2 text-gray-700">Total Chicks: {{ chicks.count }}</p>
+  </div>
+
+<!-- Alerts Card -->
+<div class="bg-white shadow rounded-xl p-6" >
+  <h3 class="text-lg font-semibold text-red-600">Active Alerts</h3>
+  
+  <div>
+    {% include "monitor/partials/dashboard_partial.html" %}
+  </div>
+  
+  
 </div>
+
+
+
 
 {% endblock %}

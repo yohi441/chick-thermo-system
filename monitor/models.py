@@ -45,6 +45,6 @@ class FeverAlert(models.Model):
     resolved_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"⚠️ Fever Alert for {self.chick.name} at {self.temperature}°C"
+        return f"⚠️ Fever Alert for {self.chick} at {self.temperature}°C"
 
 

@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.utils.timezone import now
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+import time
 
 
 def login_view(request):
@@ -25,7 +27,12 @@ def logout_view(request):
 @login_required
 def dashboard_home(request):
     chicks = Chick.objects.all()
-    active_alerts = FeverAlert.objects.filter(resolved=False)
+    active_alerts = FeverAlert.objects.filter(resolved=False).order_by('-recorded_at')
+
+    paginator = Paginator(active_alerts, 5)  # show 5 alerts per page
+    page_number = request.GET.get("page")
+    active_alerts = paginator.get_page(page_number)
+
     return render(request, 'monitor/dashboard_home.html', {
         'chicks': chicks,
         'active_alerts': active_alerts
@@ -33,11 +40,14 @@ def dashboard_home(request):
 
 @login_required
 def dashboard_partial(request):
-    chicks = Chick.objects.all()
-    active_alerts = FeverAlert.objects.filter(resolved=False)
+    """Return only the alerts partial (for HTMX refresh & pagination)"""
+    alerts = FeverAlert.objects.filter(resolved=False).order_by('-recorded_at')
+
+    paginator = Paginator(alerts, 5)
+    page_number = request.GET.get("page") or 1   # default to page 1
+    active_alerts = paginator.get_page(page_number)
     return render(request, 'monitor/partials/dashboard_partial.html', {
-        'chicks': chicks,
-        'active_alerts': active_alerts
+        'active_alerts': active_alerts,
     })
 
 @login_required

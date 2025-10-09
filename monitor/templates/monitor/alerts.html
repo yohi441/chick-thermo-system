@@ -1,47 +1,52 @@
 {% extends 'monitor/base.html' %}
 {% block content %}
-<h2>All Fever Alerts</h2>
+<h2 class="text-2xl font-semibold text-blue-600 mb-6">All Fever Alerts</h2>
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>Chick</th>
-            <th>Temperature</th>
-            <th>Recorded At</th>
-            <th>Status</th>
-            <th>Resolved At</th>
-            <th>Action</th>
-        </tr>
+<div class="overflow-x-auto">
+  <table class="min-w-full border border-gray-200 divide-y divide-gray-200 shadow rounded-lg">
+    <thead class="bg-blue-600 text-white">
+      <tr>
+        <th class="px-4 py-3 text-left text-sm font-semibold">Chick</th>
+        <th class="px-4 py-3 text-left text-sm font-semibold">Temperature</th>
+        <th class="px-4 py-3 text-left text-sm font-semibold">Recorded At</th>
+        <th class="px-4 py-3 text-left text-sm font-semibold">Status</th>
+        <th class="px-4 py-3 text-left text-sm font-semibold">Resolved At</th>
+        <th class="px-4 py-3 text-left text-sm font-semibold">Action</th>
+      </tr>
     </thead>
-    <tbody>
-        {% for alert in alerts %}
-        <tr>
-            <td>{{ alert.chick.name }}</td>
-            <td>{{ alert.temperature }}°C</td>
-            <td>{{ alert.recorded_at|date:"Y-m-d H:i" }}</td>
-            <td>
-                {% if alert.resolved %}
-                <span class="badge bg-success">Resolved</span>
-                {% else %}
-                <span class="badge bg-danger">Active</span>
-                {% endif %}
-            </td>
-            <td>
-                {% if alert.resolved_at %}
-                {{ alert.resolved_at|date:"Y-m-d H:i" }}
-                {% else %}
-                —
-                {% endif %}
-            </td>
-            <td>
-                {% if not alert.resolved %}
-                <a class="btn btn-sm btn-danger" href="{% url 'resolve_alert' alert.id %}">Resolve</a>
-                {% else %}
-                —
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
+    <tbody class="divide-y divide-gray-100 bg-white">
+      {% for alert in alerts %}
+      <tr class="hover:bg-gray-50 transition">
+        <td class="px-4 py-3 text-gray-800">{{ alert.chick.name }}</td>
+        <td class="px-4 py-3 text-gray-800">{{ alert.temperature }}°C</td>
+        <td class="px-4 py-3 text-gray-600 text-sm">{{ alert.recorded_at|date:"Y-m-d H:i" }}</td>
+        <td class="px-4 py-3">
+          {% if alert.resolved %}
+          <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">Resolved</span>
+          {% else %}
+          <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">Active</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-gray-600 text-sm">
+          {% if alert.resolved_at %}
+          {{ alert.resolved_at|date:"Y-m-d H:i" }}
+          {% else %}
+          —
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">
+          {% if not alert.resolved %}
+          <a href="{% url 'resolve_alert' alert.id %}" 
+             class="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-3 py-1 rounded-lg shadow transition">
+            Resolve
+          </a>
+          {% else %}
+          <span class="text-gray-400 text-sm">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</div>
 {% endblock %}
