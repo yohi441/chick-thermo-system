@@ -30,7 +30,7 @@
       <a hx-get="{% url 'dashboard_partial' %}?page={{ active_alerts.previous_page_number }}"
          hx-target="#alerts-container"
          hx-swap="outerHTML"
-         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
          hx-on="click: history.pushState({}, '', '/?page={{ active_alerts.previous_page_number }}')">
          Previous
       </a>
@@ -44,7 +44,7 @@
       <a hx-get="{% url 'dashboard_partial' %}?page={{ active_alerts.next_page_number }}"
          hx-target="#alerts-container"
          hx-swap="outerHTML"
-         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
          hx-on="click: history.pushState({}, '', '/?page={{ active_alerts.next_page_number }}')">
          Next
       </a>
@@ -56,3 +56,13 @@
   {% endif %}
  
 </div>
+<span id="alert-count-dashboard" hx-swap-oob="true" class="flex items-center">
+  {% if unresolved_alerts_count > 0 %}
+  <span class="font-semibold py-[5px] px-[11px] ml-2 bg-red-500 text-white rounded-full text-sm">{{unresolved_alerts_count}}</span>
+  {% endif %}
+</span>
+<span id="nav-alert-count" hx-swap-oob="true">
+  {% if unresolved_alerts_count > 0 %}
+  <span  class="font-semibold py-[5px] px-[11px] bg-red-500 text-white rounded-full text-sm">{{unresolved_alerts_count}}</span>
+  {% endif %}
+</span>

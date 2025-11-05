@@ -12,7 +12,7 @@ from drf_spectacular.utils import extend_schema
 @api_view(['GET', 'POST'])
 def monitor(request):
     if request.method == 'GET':
-        return Response({"message": "example of get requests"}, status=status.HTTP_200_OK)
+        return Response({"message": "this is example of the api get request"}, status=status.HTTP_200_OK)
 
     elif request.method == 'POST':
         serializer = TempSerializer(data=request.data)
@@ -24,10 +24,11 @@ def monitor(request):
                 tag_id=tag_id
             )
 
-            TemperatureReading.objects.create(
-                chick=chick,
-                temperature=temp
-            )
+            # TemperatureReading.objects.create(
+            #     chick=chick,
+            #     temperature=temp
+            # )
+            
             FeverAlert.objects.create(
                 chick=chick,
                 temperature=temp,

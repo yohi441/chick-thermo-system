@@ -7,6 +7,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 import time
 
+ALERT_PARIAL_LIST = "monitor/partials/alerts_partial.html"
+
+def get_active_alerts_count():
+    active_alerts = FeverAlert.objects.filter(resolved=False).order_by('-recorded_at')
+    unresolved_alerts_count = active_alerts.count()
+
+    return unresolved_alerts_count
+    
+
 
 def login_view(request):
     if request.method == "POST":
@@ -28,6 +37,7 @@ def logout_view(request):
 def dashboard_home(request):
     chicks = Chick.objects.all()
     active_alerts = FeverAlert.objects.filter(resolved=False).order_by('-recorded_at')
+    unresolved_alerts_count = active_alerts.count()
 
     paginator = Paginator(active_alerts, 5)  # show 5 alerts per page
     page_number = request.GET.get("page")
@@ -35,7 +45,8 @@ def dashboard_home(request):
 
     return render(request, 'monitor/dashboard_home.html', {
         'chicks': chicks,
-        'active_alerts': active_alerts
+        'active_alerts': active_alerts,
+        'unresolved_alerts_count': unresolved_alerts_count,
     })
 
 @login_required
@@ -46,19 +57,53 @@ def dashboard_partial(request):
     paginator = Paginator(alerts, 5)
     page_number = request.GET.get("page") or 1   # default to page 1
     active_alerts = paginator.get_page(page_number)
+    unresolved_alerts_count = get_active_alerts_count()
     return render(request, 'monitor/partials/dashboard_partial.html', {
         'active_alerts': active_alerts,
+        'unresolved_alerts_count': unresolved_alerts_count,
+        
     })
 
 @login_required
 def alert_list(request):
     alerts = FeverAlert.objects.all().order_by('-recorded_at')
-    return render(request, 'monitor/alerts.html', {'alerts': alerts})
+    unresolved_alerts_count = get_active_alerts_count()
+    paginator = Paginator(alerts, 10)  
+    page_number = request.GET.get("page")
+    alerts = paginator.get_page(page_number)
+    return render(request, 'monitor/alerts.html', {'alerts': alerts, 'unresolved_alerts_count': unresolved_alerts_count,})
+
+@login_required
+def alert_pagination(request):
+    alerts = FeverAlert.objects.all().order_by('-recorded_at')
+    unresolved_alerts_count = get_active_alerts_count()
+    paginator = Paginator(alerts, 10) 
+    page_number = request.GET.get("page")
+    alerts = paginator.get_page(page_number)
+
+    return render(request, ALERT_PARIAL_LIST, {'alerts': alerts, 'unresolved_alerts_count': unresolved_alerts_count,})
+
 
 @login_required
 def resolve_alert(request, alert_id):
-    alert = get_object_or_404(FeverAlert, id=alert_id)
-    alert.resolved = True
-    alert.resolved_at = now()
-    alert.save()
+    if request.htmx:
+        alert = get_object_or_404(FeverAlert, id=alert_id)
+        alert.resolved = True
+        alert.resolved_at = now()
+        alert.save()
+        unresolved_alerts_count = get_active_alerts_count()
+        alerts = FeverAlert.objects.all().order_by('-recorded_at')
+        paginator = Paginator(alerts, 10) 
+        page_number = request.GET.get("page")
+        alerts = paginator.get_page(page_number)
+        return render(request, ALERT_PARIAL_LIST, {'alerts': alerts, 'unresolved_alerts_count': unresolved_alerts_count,})
     return redirect('alert_list')
+
+@login_required
+def alert_list_partial(request):
+    alerts = FeverAlert.objects.all().order_by('-recorded_at')
+    unresolved_alerts_count = get_active_alerts_count()
+    return render(request, ALERT_PARIAL_LIST, {
+        'alerts': alerts,
+        'unresolved_alerts_count': unresolved_alerts_count,
+    })

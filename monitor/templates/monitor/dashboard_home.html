@@ -10,10 +10,73 @@
 
 <!-- Alerts Card -->
 <div class="bg-white shadow rounded-xl p-6" >
-  <h3 class="text-lg font-semibold text-red-600">Active Alerts</h3>
-  
+  <h3 class="flex items-center text-lg font-semibold text-red-600">
+  <span>Active Alerts</span>
+  <span id="alert-count-dashboard" hx-swap-oob="true" class="flex items-center">
+    {% if unresolved_alerts_count > 0 %}
+    <span class="font-semibold py-[5px] px-[11px] ml-2 bg-red-500 text-white rounded-full text-sm">{{unresolved_alerts_count}}</span>
+    {% endif %}
+  </span>
+   
+  </h3>
+ 
   <div>
-    {% include "monitor/partials/dashboard_partial.html" %}
+    <div id="alerts-container"
+     hx-get="{% url 'dashboard_partial' %}?page={{ active_alerts.number }}"
+     hx-trigger="every 2s"
+     hx-swap="outerHTML"
+     hx-push-url="false"
+     hx-indicator="#alerts-loading"
+     >
+
+  {% if active_alerts %}
+  <ul class="mt-4 space-y-3">
+    {% for alert in active_alerts %}
+    <li class="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+      <span class="text-gray-800">
+        {{ alert.chick.name }} – {{ alert.temperature }}°C 
+        <span class="text-gray-500 text-sm">({{ alert.recorded_at|date:"Y-m-d H:i" }})</span>
+      </span>
+      <a href="{% url 'resolve_alert' alert.id %}" 
+         class="bg-red-600 text-white text-sm px-3 py-1 rounded-lg hover:bg-red-700 transition">
+        Resolve
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <!-- Pagination controls -->
+  <div class="mt-4 flex justify-center space-x-2">
+    {% if active_alerts.has_previous %}
+      <a hx-get="{% url 'dashboard_partial' %}?page={{ active_alerts.previous_page_number }}"
+         hx-target="#alerts-container"
+         hx-swap="outerHTML"
+         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
+         hx-on="click: history.pushState({}, '', '/?page={{ active_alerts.previous_page_number }}')">
+         Previous
+      </a>
+    {% endif %}
+
+    <span class="px-3 py-1 bg-gray-100 rounded">
+      Page {{ active_alerts.number }} of {{ active_alerts.paginator.num_pages }}
+    </span>
+
+    {% if active_alerts.has_next %}
+      <a hx-get="{% url 'dashboard_partial' %}?page={{ active_alerts.next_page_number }}"
+         hx-target="#alerts-container"
+         hx-swap="outerHTML"
+         class="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
+         hx-on="click: history.pushState({}, '', '/?page={{ active_alerts.next_page_number }}')">
+         Next
+      </a>
+    {% endif %}
+  </div>
+
+  {% else %}
+  <p class="mt-2 text-gray-600">No active alerts ✅</p>
+  {% endif %}
+ 
+</div>
   </div>
   
   

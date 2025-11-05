@@ -4,3 +4,4 @@ sqlparse==0.5.3
 djangorestframework==3.16.1
 drf-spectacular==0.28.0
 drf-spectacular-sidecar==2025.10.1
+django-htmx==1.26.0
